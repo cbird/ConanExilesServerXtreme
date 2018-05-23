@@ -8,7 +8,7 @@ namespace ConanExilesServer.Helpers
     /// <summary>
     /// Implementation taken from Microsoft.AspNet.Identity.AsyncHelper
     /// </summary>
-    public class AsyncHelper
+    public static class AsyncHelper
     {
         private static readonly CancellationToken DefaultCancellationToken = CancellationToken.None;
         private static readonly TaskCreationOptions DefaultTaskCreationOptions = TaskCreationOptions.None;

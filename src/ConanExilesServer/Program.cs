@@ -3,6 +3,9 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using ConanExilesServer.Helpers;
+using ConanExilesServer.Server;
+using ConanExilesServer.Settings;
+using Microsoft.Extensions.Options;
 
 namespace ConanExilesServer
 {
@@ -12,7 +15,7 @@ namespace ConanExilesServer
     class Program
     {
         [Flags]
-        private enum ExitCode
+        enum ExitCode
         {
             Success = 0,
             UnknownError = 100
@@ -59,14 +62,19 @@ namespace ConanExilesServer
 
         static async Task<ExitCode> MainAsync(string[] args, CancellationToken token)
         {
-            var counter = 1;
-            Console.Write($"Idle");
-            while (!token.IsCancellationRequested)
+            var options = Options.Create(new ServerUpdaterSettings
             {
-                Console.Write($".");
-                await Task.Delay(1000, token);
-                counter++;
-            }
+                SteamCmdInstallDir = @"c:\temp\steamcmd\",
+                SteamCmdDownloadUrl = "https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip",
+                ServerInstallDir = @"c:\temp\conan_server\"
+            });
+            var updater = new ServerUpdater(options);
+            
+            await updater.EnsureSteamCmdExistsAsync(token);
+            await updater.RunSteamCmdUpdaterAsync(token);
+
+            Console.WriteLine("Done! Exiting ConanServer...");
+            
             return ExitCode.Success;
         }
     }
