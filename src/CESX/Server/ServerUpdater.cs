@@ -5,26 +5,27 @@ using System.IO.Compression;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using ConanExilesServer.Helpers;
-using ConanExilesServer.Settings;
+using CESX.Helpers;
+using CESX.Settings;
 using Microsoft.Extensions.Options;
 
-namespace ConanExilesServer.Server
+namespace CESX.Server
 {
-    public class ServerUpdater
+    public class ServerUpdater : IDisposable
     {
         private const int ConanExilesServerSteamAppId = 443030;
-        private readonly ServerUpdaterSettings _settings;
+        private readonly CesxSettings _settings;
+        private ProcessWrapper _process;
 
-        public ServerUpdater(IOptions<ServerUpdaterSettings> options)
+        public ServerUpdater(CesxSettings settings)
         {
-            _settings = options.Value;
+            _settings = settings;
         }
 
         public async Task EnsureSteamCmdExistsAsync(CancellationToken cancellationToken)
         {
             if (File.Exists(_settings.SteamCmdPath))
-                return;
+                Directory.Delete(_settings.SteamCmdInstallDir, true); // always delete before otherwise it could end up in a weird state "Waiting for user info...OK"
 
             if (!_settings.SteamCmdDownloadUrl.EndsWith(".zip", StringComparison.InvariantCultureIgnoreCase))
                 throw new NotSupportedException(
@@ -54,14 +55,20 @@ namespace ConanExilesServer.Server
                 var steamCmdArgs =
                     $"+login anonymous +force_install_dir \"{_settings.ServerInstallDir}\" +app_update {ConanExilesServerSteamAppId} +quit";
 
-                var proc = new ProcessUtil(_settings.SteamCmdPath, steamCmdArgs);
-                proc.Start();
+                _process = ProcessWrapper.Create(_settings.SteamCmdPath)
+                    .WithArgs(steamCmdArgs)
+                    .Start();
 
-                proc.OutputDataReceived += (e, args) => Console.WriteLine(args.Data);
-                proc.ErrorDataReceived += (e, args) => Console.WriteLine(args.Data);
+                _process.OutputDataReceived += (e, args) => Console.WriteLine(args.Data);
+                _process.ErrorDataReceived += (e, args) => Console.Error.WriteLine(args.Data);
 
-                proc.Wait(cancellationToken);
+                _process.Wait();
             }, cancellationToken);
+        }
+
+        public void Dispose()
+        {
+            _process?.Dispose();
         }
     }
 }

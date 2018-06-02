@@ -1,8 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConanExilesServer", "ConanExilesServer\ConanExilesServer.csproj", "{F8E73AFA-564A-4A57-825B-AED061BD7FE4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CESX", "CESX\CESX.csproj", "{F8E73AFA-564A-4A57-825B-AED061BD7FE4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConanExilesServer.Tests", "ConanExilesServer.Tests\ConanExilesServer.Tests.csproj", "{9F561A4A-E802-4FA2-840F-29A8E12F5A24}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CESX.Tests", "CESX.Tests\CESX.Tests.csproj", "{9F561A4A-E802-4FA2-840F-29A8E12F5A24}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
